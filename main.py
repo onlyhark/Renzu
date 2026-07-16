@@ -16,6 +16,7 @@ from commands.pwd_cmd import show_pwd
 from commands.ls_cmd import list_directory
 from commands.imports_cmd import show_imports
 from commands.cat_cmd import show_file
+from commands.lsb_cmd import extract_lsb
 
 
 print("RENZU v0.1")
@@ -82,6 +83,9 @@ while True:
 
     elif command == "cat":
         show_file(argument)
+
+    elif command == "lsb":
+        extract_lsb(user_input.split()[1:])
 
     else:
         print(f"Unknown command: {command}")
