@@ -16,4 +16,5 @@ def show_help():
     print(" peinfo    - Analyze Windows PE files")
     print(" imports   - Show imported DLL functions")
     print(" cat       - Display text file contents")
+    print(" lsb       - Extract LSB channels and bitplanes")
     print(" exit  - Exit Renzu\n")
