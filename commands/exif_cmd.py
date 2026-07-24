@@ -1,29 +1,92 @@
-from PIL import Image
-from PIL.ExifTags import TAGS
+import subprocess
+import json
 import os
 
 
-def show_exif(filepath):
-    if not os.path.exists(filepath):
-        print("File not found.")
+def show_exif(file_path):
+    if not file_path:
+        print("Usage: exif <image_path>")
+        return
+
+    if not os.path.exists(file_path):
+        print("[-] File not found.")
         return
 
     try:
-        image = Image.open(filepath)
+        result = subprocess.run(
+            ["exiftool", "-j", file_path],
+            capture_output=True,
+            text=True,
+            check=True
+        )
 
-        exif_data = image.getexif()
+        metadata = json.loads(result.stdout)[0]
 
-        if not exif_data:
-            print("No EXIF data found.")
-            return
+        print("=" * 70)
+        print("                    RENZU EXIF ANALYSIS")
+        print("=" * 70)
 
-        print("\n========== EXIF DATA ==========\n")
+        important_fields = [
+            "FileName",
+            "Directory",
+            "FileSize",
+            "FileType",
+            "FileTypeExtension",
+            "MIMEType",
 
-        for tag_id, value in exif_data.items():
-            tag = TAGS.get(tag_id, tag_id)
-            print(f"{tag}: {value}")
+            "ImageWidth",
+            "ImageHeight",
 
-        print()
+            "Artist",
+            "Author",
+            "Creator",
+
+            "Comment",
+            "UserComment",
+            "XPComment",
+
+            "ImageDescription",
+            "Description",
+            "Caption-Abstract",
+
+            "XPTitle",
+            "XPSubject",
+            "XPKeywords",
+
+            "Copyright",
+
+            "Software",
+
+            "CreateDate",
+            "ModifyDate",
+            "DateTimeOriginal",
+
+            "Make",
+            "Model",
+
+            "GPSLatitude",
+            "GPSLongitude",
+
+            "Keywords"
+        ]
+
+        print("\n[ Important Metadata ]\n")
+
+        for field in important_fields:
+            print(f"{field:<25}: {metadata.get(field, 'Not Found')}")
+
+        print("\n" + "=" * 70)
+        print("                    ALL METADATA")
+        print("=" * 70)
+
+        for key in sorted(metadata.keys()):
+            print(f"{key:<35}: {metadata[key]}")
+
+    except FileNotFoundError:
+        print("[-] ExifTool is not installed or not in PATH.")
+
+    except subprocess.CalledProcessError:
+        print("[-] ExifTool failed to read metadata.")
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"[-] {e}")
